@@ -88,20 +88,18 @@ public class HibernateUtils {
     /*
     READING THE ALREADY SAVED RESERVATION DATES
     */
-    public static List<LocalDateRange> gettingOldReservations(){
+    public static List<Reservation> gettingOldReservations(){
         SessionFactory sessionFactory = HibernateUtils.getSessionFactory();
-        List<LocalDateRange> oldReservations = new ArrayList<>();
+        List<Reservation> oldReservations = new ArrayList<>();
 
         if (sessionFactory!=null) {
             //Initialize session object
             Session session = sessionFactory.openSession();
             try {
                 session.beginTransaction();
-                List<Reservation> list = session.createQuery("from Reservation R", Reservation.class).getResultList();
+                oldReservations = session.createQuery("from Reservation R", Reservation.class).getResultList();
                 session.getTransaction().commit();
-                for(Reservation r: list){
-                    oldReservations.add(LocalDateRange.ofClosed(r.getBeginDate(), r.getEndDate()));
-                }
+
 
             } catch (Exception e) {
 

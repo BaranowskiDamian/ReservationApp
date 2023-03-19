@@ -1,30 +1,3 @@
-/*
-THIS APP ALLOWS YOU TO CHOSE DATES FOR A RENTAL AND CALCULATES THE PRICE ACCORDING TO PREDEFINED PRICES IN
-A MYSQL DATABASE.
-THE PRICE GIVEN IS THE TOTAL PRICE, BUT ON A REQUEST IT SHOWS THE SPREAD WITH AMOUNT OF DAYS
-AND WHAT THEIR COST IS (DIFFERENT PRICES IN DIFFERENT "SEASONS")
-
-THE APP CHECKS THE CHOSEN PERIOD WITH ALREADY CONFIRMED (SAVED) RENTAL TIMES FOR COLLISIONS AND GIVES A FEEDBACK IT OCCURS.
-THE NEEDED DATABASE (SCHEMA: calculatecost) TABLES ARE:
-
-CREATE TABLE COST_PER_DAY (
-ID INT PRIMARY KEY AUTO_INCREMENT,
-SEASONNAME VARCHAR(25),
-BEGIN_DATE DATE,
-END_DATE DATE,
-COST INT);
-
-CREATE TABLE RESERVATIONS (
-ID INT PRIMARY KEY AUTO_INCREMENT,
-FIRSTNAME VARCHAR(15),
-LASTNAME VARCHAR(15),
-EMAILADRESS VARCHAR(50),
-TELEPHONENUMBER INT,
-BEGINDATE DATE,
-ENDDATE DATE,
-COST INT);
-
-*/
 package calculate_cost_of_rental;
 
 import calculate_cost_of_rental.Utils.HibernateUtils;
@@ -84,7 +57,7 @@ public class Main {
                     if (endDate.isAfter(beginDate)) {
                         rentRange = LocalDateRange.ofClosed(beginDate, endDate);
 
-                        if (!checkWithOldReservation(rentRange, HibernateUtils.gettingOldReservations())) {
+                        if (!checkWithOldReservation(rentRange, getLocalDateRangeFromOldReservations())) {
                             bDateChosenCorrectly= true;
                             bRentRangeChosen = true;
                         }
@@ -247,4 +220,12 @@ public class Main {
         return bIsConnected;
     }
 
+    public static List<LocalDateRange> getLocalDateRangeFromOldReservations(){
+        List<LocalDateRange> oldReservationsRanges = new ArrayList<>();
+        List<Reservation> oldReservations = HibernateUtils.gettingOldReservations();
+        for (Reservation r :oldReservations){
+            oldReservationsRanges.add(LocalDateRange.of(r.getBeginDate(), r.getEndDate()));
+        }
+        return oldReservationsRanges;
+    }
 }
